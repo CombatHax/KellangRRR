@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import kellang.Action;
 import kellang.Function;
@@ -18,8 +19,8 @@ public class Main {
     }
 
     private static void initialize() {
-        HashMap<String, Class> args = new HashMap<>();
-        args.put("string", String.class);
+        LinkedList<Class> args = new LinkedList<>();
+        args.add(String.class);
         new Function("o", new Action[]{new Action(Action.ACTIONS.OUTPUT)}, args);
     }
 }

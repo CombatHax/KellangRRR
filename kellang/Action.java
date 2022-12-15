@@ -1,6 +1,6 @@
 package kellang;
 
-import java.util.HashMap;
+import java.util.LinkedList;
 
 public class Action {
     public enum ACTIONS {
@@ -12,10 +12,10 @@ public class Action {
         this.type = type;
     }
 
-    public void run(HashMap<String, Object> args) {
+    public void run(LinkedList<Object> args) {
         switch(this.type) {
             case OUTPUT:
-                System.out.println(args.get("string"));
+                System.out.println(args.get(0));
         }
     }
 }

@@ -19,13 +19,17 @@ public class Kellang {
         String line;
         while(sc.hasNextLine()) {
             line = sc.nextLine();
-            LinkedList<Object> tokens = analyzeLine(line);
-            HashMap<>
+            Object[] stuff = analyzeLine(line);
+            if(stuff == null) return;
+            Function func = (Function) stuff[0];
+            LinkedList<Object> args = (LinkedList<Object>) stuff[1];
+            func.run(args);
         }
     }
-    private LinkedList<Object> analyzeLine(String line) {
+    private Object[] analyzeLine(String line) {
         line = line.strip();
-        LinkedList<Object> tokens = new LinkedList<>();
+        Function f = null;
+        LinkedList<Object> args = new LinkedList<>();
         StringBuilder curTok = new StringBuilder();
         int inst = 0;
         boolean inQuote = false;
@@ -33,24 +37,15 @@ public class Kellang {
             if(inst == 0) {
                 if(c == ' ') {
                     inst = 1;
-                    /*
-                    Object val = getType(curTok.toString().strip());
-                    if(!(val instanceof String)) {
-                        return null;
-                    } else {
-                        tokens.add(val);
-                    }
-                     */
-                    Function func = Function.getFunction(curTok.toString().strip());
-                    if(func == null) return null;
-                    tokens.add(func);
+                    f = Function.getFunction(curTok.toString().strip());
+                    if(f == null) return null;
                     curTok = new StringBuilder();
                 }
             } else {
                 switch (c) {
                     case ',' -> {
                         if (!inQuote) {
-                            tokens.add(getType(curTok.toString().strip()));
+                            args.add(getType(curTok.toString().strip()));
                             curTok = new StringBuilder();
                         }
                         continue;
@@ -63,18 +58,24 @@ public class Kellang {
             }
             curTok.append(c);
         }
-        tokens.add(curTok.toString().strip());
-        return tokens;
+        args.add(curTok.toString().strip());
+        return new Object[]{f, args};
     }
 
     public Object getType(String val) {
         boolean isNum = true;
         boolean isString = val.charAt(0) == '"' && val.charAt(val.length() - 1) == '"';
         boolean acceptable = false;
+        int dots = 0;
+        int quotes = 0;
         String nums = "1234567890.";
         for(char c : val.toCharArray()) {
             if(nums.indexOf(c) == -1) isNum = false;
+            if(c == '.') dots++;
+            else if(c == '\\') acceptable = true;
+            else if(c == '"' && !acceptable) return null;
         }
+        if(dots > 1) isNum = false;
         if(isNum) return Float.parseFloat(val);
         return val;
     }
